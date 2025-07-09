@@ -8,7 +8,7 @@ This app is designed to provide personalized fashion advice, outfit suggestions,
 
 ##  Features
 
--  **Natural Chat Interface** – ask Olivia for style suggestions just like you would text a best friend
+-  **Natural Chat Interface** – ask for style suggestions just like you would text a best friend
 -  **Outfit Planning** – get suggestions for brunches, dates, interviews, and more
 -  **Color & Accessory Matching** – describe a clothing item and Olivia helps you pair it
 -  **Capsule Wardrobe Tips** – minimalist and travel-friendly fashion advice
