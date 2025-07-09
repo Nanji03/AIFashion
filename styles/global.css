@@ -1,0 +1,10 @@
+/* File: styles/global.css */
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #fff5f7;
+}
+
+input, button {
+  outline: none;
+}
