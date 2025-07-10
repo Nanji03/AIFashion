@@ -17,10 +17,14 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-pink-50 flex justify-center items-center p-4">
-      {!apiKey ? <ApiKeyModal onSave={handleSaveKey} /> : <ChatWindow apiKey={apiKey} />}
-    </div>
-  );
+    <div className="bg-pink-50 min-h-screen w-full flex justify-center items-center p-6">
+      
+    <h1 className="absolute top-6 text-4xl font-serif text-pink-600 font-bold tracking-wider drop-shadow-md z-10">
+      Olivia
+    </h1>
+    {!apiKey ? <ApiKeyModal onSave={handleSaveKey} /> : <ChatWindow apiKey={apiKey} />}
+  </div>
+);
 };
 
 export default App;

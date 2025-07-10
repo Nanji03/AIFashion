@@ -1,0 +1,29 @@
+/* File: styles/global.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #fff5f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+input, button {
+  outline: none;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+h1, h2, h3 {
+  font-family: 'Playfair Display', serif;
+}
