@@ -1,6 +1,6 @@
 #  AIFashion
 
-It is a stylish, witty AI-powered fashion advisor chatbot built using React + TypeScript and OpenAI's GPT-3.5.
+It is a stylish, witty AI-powered fashion advisor chatbot built using React + TypeScript and OpenAI's gpt-4-vision-preview/gpt-4.
 
 This app is designed to provide personalized fashion advice, outfit suggestions, and vibe-based looks for any occasion.
 
