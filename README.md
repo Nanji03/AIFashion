@@ -21,7 +21,7 @@ This app is designed to provide personalized fashion advice, outfit suggestions,
 
 - **Frontend**: React + TypeScript
 - **Styling**: TailwindCSS-style classes
-- **AI**: OpenAI GPT-3.5 API
+- **AI**: gpt-4-vision-preview/gpt-4
 - **Storage**: Browser localStorage for API key
 - **Deployment**: Vercel
 
