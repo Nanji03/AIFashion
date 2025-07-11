@@ -17,7 +17,7 @@ export const sendMessageToAI = async (
 
   const payload: any = {
     model: hasImage ? 'gpt-4-vision-preview' : 'gpt-4',
-    messages: formattedMessages,
+    messages: hasImage ? formattedMessages.slice(0, -1) : formattedMessages,
   };
 
   if (hasImage && latestMessage.fileUrl) {
@@ -38,20 +38,25 @@ export const sendMessageToAI = async (
     });
   }
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(payload),
-  });
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(payload),
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  if (!response.ok) {
-    throw new Error(data?.error?.message || 'Failed to fetch AI response');
+    if (!response.ok) {
+      throw new Error(data?.error?.message || 'Failed to fetch AI response');
+    }
+
+    return data.choices?.[0]?.message?.content || '';
+  } catch (err) {
+    console.error('OpenAI API error:', err);
+    return 'Oops, something went wrong while trying to get Olivia’s response.';
   }
-
-  return data.choices?.[0]?.message?.content || '';
 };

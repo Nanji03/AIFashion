@@ -1,16 +1,15 @@
-// File: ChatWindow.tsx
+// Updated ChatWindow.tsx with proper File handling and Blob typing
 import React, { useState } from 'react';
 import MessageBubble from './MessageBubble';
 import { sendMessageToAI } from '../api';
 import { systemPrompt } from '../utils/promptBuilder';
 import { ChatMessage } from '../types';
+import { resizeImage } from '../utils/utils';
 
-interface Props {
-  apiKey: string;
-}
-
-const ChatWindow: React.FC<Props> = ({ apiKey }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+const ChatWindow: React.FC<{ apiKey: string }> = ({ apiKey }) => {
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { role: 'system', content: systemPrompt }
+  ]);
   const [input, setInput] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [isTyping, setIsTyping] = useState(false);
@@ -18,75 +17,58 @@ const ChatWindow: React.FC<Props> = ({ apiKey }) => {
   const handleSend = async () => {
     if (!input.trim() && !file) return;
 
-    const fileUrl = file ? URL.createObjectURL(file) : undefined;
+    let fileUrl: string | undefined = undefined;
+    let processedFile: Blob | undefined = undefined;
+
+    if (file) {
+      try {
+        processedFile = await resizeImage(file, 512); // Resize and assign typed Blob
+        fileUrl = URL.createObjectURL(processedFile);
+      } catch (error) {
+        console.error('Image processing failed', error);
+      }
+    }
 
     const newMessage: ChatMessage = {
       role: 'user',
       content: input || (file ? 'What do you think of this?' : ''),
       fileUrl,
-};
+    };
 
     const updatedMessages = [...messages, newMessage];
     setMessages(updatedMessages);
     setInput('');
+    setFile(null);
     setIsTyping(true);
 
-    const response = await sendMessageToAI(updatedMessages, apiKey, file || undefined);
-    setMessages([...updatedMessages, { role: 'assistant', content: response }]);
-    setFile(null);
+    const reply = await sendMessageToAI(updatedMessages, apiKey, processedFile);
+    setMessages([...updatedMessages, { role: 'assistant', content: reply }]);
     setIsTyping(false);
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = e.target.files?.[0];
-    if (selected) setFile(selected);
   };
 
   return (
     <div className="bg-white shadow-lg rounded-lg w-full max-w-2xl h-[80vh] flex flex-col relative">
-      <h1 className="absolute top-4 left-4 text-4xl font-serif text-pink-600 font-bold tracking-wide drop-shadow-lg">Olivia</h1>
-
-      <div className="p-4 overflow-y-auto flex-1 mt-12 space-y-3">
-  {messages.map((msg, i) => (
-    <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-      <div className={`max-w-xs px-4 py-2 rounded-lg ${msg.role === 'user' ? 'bg-pink-300 text-white' : 'bg-gray-200 text-black'}`}>
-        <p>{msg.content}</p>
-
-        {msg.fileUrl && (
-          <>
-            {msg.fileUrl.endsWith('.mp4') ? (
-              <video controls className="mt-2 rounded max-w-[200px]">
-                <source src={msg.fileUrl} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            ) : (
-              <img
-                src={msg.fileUrl}
-                alt="Uploaded media"
-                className="mt-2 rounded max-w-[200px]"
-              />
-            )}
-          </>
-        )}
+      <h1 className="absolute top-4 text-4xl font-serif text-pink-600 font-bold tracking-wide drop-shadow-lg left-4">Olivia</h1>
+      <div className="p-4 mt-12 overflow-y-auto flex-1">
+        {messages.filter(msg => msg.role !== 'system').map((msg, i) => (
+          <MessageBubble key={i} role={msg.role} content={msg.content} fileUrl={msg.fileUrl} />
+        ))}
+        {isTyping && <div className="text-sm text-gray-400 italic">Olivia is typing...</div>}
       </div>
-    </div>
-  ))}
-
-  {isTyping && (
-    <div className="text-sm text-gray-400 italic mt-2">Olivia is typing...</div>
-  )}
-</div>
-
-
-      <div className="p-4 border-t flex items-center gap-2">
+      <div className="p-4 border-t flex flex-col sm:flex-row gap-2">
         <input
           type="text"
-          value={input}
-          placeholder="Ask Olivia something stylish..."
-          onChange={(e) => setInput(e.target.value)}
           className="flex-1 border rounded px-4 py-2"
+          placeholder="Ask Olivia something stylish..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
         />
-        <input type="file" accept="image/*,video/*" onChange={handleFileChange} />
+        <input
+          type="file"
+          accept="image/*,video/*"
+          className="border rounded px-2 py-1"
+          onChange={(e) => setFile(e.target.files?.[0] || null)}
+        />
         <button
           className="bg-pink-500 text-white px-4 py-2 rounded"
           onClick={handleSend}
